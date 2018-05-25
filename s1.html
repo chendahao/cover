@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>列表</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" type="text/css" href="css/mui.min.css" />
+		<style type="text/css">
+			.mui-table h4,
+			.mui-table h5,
+			.mui-table .mui-h5,
+			.mui-table .mui-h6,
+			.mui-table p {
+				margin-top: 0;
+			}
+			
+			.mui-table h4 {
+				line-height: 21px;
+				font-weight: 500;
+			}
+			
+			.mui-table .oa-icon {
+				position: absolute;
+				right: 0;
+				bottom: 0;
+			}
+			
+			.mui-table .oa-icon-star-filled {
+				color: #f14e41;
+			}
+			
+			textarea.noscrollbars {
+				overflow: hidden;
+				width: 100%;
+				height: 80px;
+			}
+			html,body {
+				background-color: #efeff4;
+			}
+			.title{
+				margin: 20px 15px 10px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+			a:link {
+		    	color:#000000;
+		    }
+		</style>
+	</head>
+
+	<body>
+		<!--<header class="mui-bar mui-bar-nav">
+			<a class="mui-icon mui-icon mui-icon mui-icon-reload mui-pull-left" style="color: #999;" href="javascript:refresh()"></a>
+			<a class="mui-icon mui-icon-home-filled mui-pull-right" style="color: #999;" href="index.html"></a>
+			<h1 class="mui-title">未完成列表</h1>
+		</header>-->
+		<div id="pullrefresh" class="mui-content" style="margin-top: 0px;">
+			<ul id="ulcontent" class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+			</ul>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/jquery.min.js"></script>
+		<script src="js/baseData.js"></script>
+		<!--<script src="js/socket.io.js"></script>-->
+		<!--		<script src="js/domWeb.js"></script>-->
+		<script type="text/javascript">
+			mui.init({
+				pullRefresh: {
+					container: '#pullrefresh',
+					down: {
+						style:'circle',
+//						offset: '45px',
+						callback: pulldownRefresh
+					},
+					up: {
+						auto:false,
+						contentrefresh: '正在加载...',
+						contentnomore:'没有更多数据了',
+						callback: pullupRefresh
+					}
+				}
+			});
+			
+			var NotifyID = 1;
+			function createLocalPushMsg() {
+				NotifyID += 1;
+				var Context = plus.android.importClass("android.content.Context");
+				var main = plus.android.runtimeMainActivity();
+				var Noti = plus.android.importClass("android.app.Notification");
+				var NotificationManager = plus.android.importClass("android.app.NotificationManager");
+				var nm = main.getSystemService(Context.NOTIFICATION_SERVICE)
+				var Notification = plus.android.importClass("android.app.Notification");
+				var mNotification = new Notification.Builder(main);
+				mNotification.setOngoing(false);
+				mNotification.setContentTitle("井盖监管系统 ")
+				mNotification.setContentText("收到一条井盖异常通知。")
+				mNotification.setSmallIcon(17301625)
+				mNotification.setTicker("通知提示")
+				var mNb = mNotification.build()
+				nm.notify(NotifyID, mNb);
+			}
+			// 判断扩展API是否准备，否则监听'plusready'事件
+			if(window.plus) {
+				plusReady();
+			} else {
+				document.addEventListener('plusready', plusReady, false);
+			}
+			function plusReady(){ 
+				if(window.WebSocket) {
+					var host = wsUrl;
+					webSocket = new WebSocket(host);
+					webSocket.onopen = function() {
+//		                console.log("onopen"); 
+					}
+					webSocket.onmessage = function(msg) {
+						var socketData = eval('(' + msg.data + ')');
+						var localUserId = localStorage.localUserId;
+						//若果该消息属于该用户，则发送报警
+						if(localUserId == socketData.userid) {
+							//创建消息
+							createLocalPushMsg();
+							//手机震动
+							plus.device.vibrate(300);
+							//蜂鸣1声
+							plus.device.beep(1);
+							//刷新列表
+							getstatus1();
+						}
+					}
+					webSocket.onclose = function() {
+						console.log("状态");
+						//noty({ text: "Socket状态：" + readyState[webSocket.readyState], theme: 'relax', type: 'error', layout: 'bottomRight', timeout: 2000 });
+						//意外断开后重新连接
+						//setTimeout(connectWebSocket, 500);
+					}
+				} else {
+					console.log("不支持websocket");
+				}
+			}
+			function refresh(){
+				getstatus1();		
+				plus.nativeUI.toast("刷新成功");
+			}
+			var page = 1;
+			getstatus1();			
+			function getstatus1() {				
+				if (page!=1) {
+					page=1
+				}
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/getstatus1",
+					data:{uid:localStorage.getItem("localUserId"),page:page},
+					dataType: "json",
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							var str = "";
+							for(var d in datas) {
+								str += "<li class=\"mui-table-view-cell\">";
+								str += "<div class=\"mui-table\">";
+								str += "<div class=\"mui-table-cell mui-col-xs-8\">";
+								str += "<p><a href=\"javascript:void(0)\" onclick=\"checkStatus(\'" + datas[d].WarnResolveId + "','" + datas[d].Status + "\')\">" + data[d].Info + "</a></p>";
+//								str += "<p><a href=check"+ datas[d].Status + ".html?WarnResolveId=" + datas[d].WarnResolveId + "\>" + data[d].Info + "</a></p>";
+								str += "</div>";
+								str += "<div class=\"mui-table-cell mui-col-xs-4 mui-text-right\">";
+								str += "<span class=\"mui-h5\">" + formatyn(data[d].STime) + "</span></br>";
+								str += "<span class=\"mui-h5\">" + formtState(data[d].Status) + "</span>";
+								str += "</div>";
+								str += "</div>";
+								str += "</li>";
+							};
+							document.getElementById('ulcontent').innerHTML = str;
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("获取数据时出错，请稍后再试");
+					}
+				});
+			};
+			
+			//上拉加载
+			function pullupRefresh() {
+				page++;
+				setTimeout(function() {
+					$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/getstatus1",
+					data:{uid:localStorage.getItem("localUserId"),page:page},
+					dataType: "json",
+					success: function(data) {
+						if(data.status=='is null'){
+							mui('#pullrefresh').pullRefresh().endPullupToRefresh(true);
+							return;
+						}
+						if(data != null) {
+							var datas = eval(data);
+							var str = "";
+							for(var d in datas) {
+								str += "<li class=\"mui-table-view-cell\">";
+								str += "<div class=\"mui-table\">";
+								str += "<div class=\"mui-table-cell mui-col-xs-8\">";
+								str += "<p><a href=\"javascript:void(0)\" onclick=\"checkStatus(\'" + datas[d].WarnResolveId + "','" + datas[d].Status + "\')\">" + data[d].Info + "</a></p>";
+//								str += "<p><a href=check"+ datas[d].Status + ".html?WarnResolveId=" + datas[d].WarnResolveId + "\>" + data[d].Info + "</a></p>";
+								str += "</div>";
+								str += "<div class=\"mui-table-cell mui-col-xs-4 mui-text-right\">";
+								str += "<span class=\"mui-h5\">" + formatyn(data[d].STime) + "</span></br>";
+								str += "<span class=\"mui-h5\">" + formtState(data[d].Status) + "</span>";
+								str += "</div>";
+								str += "</div>";
+								str += "</li>";
+							};
+							document.getElementById('ulcontent').innerHTML += str;
+							mui('#pullrefresh').pullRefresh().endPullupToRefresh(false);
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("获取数据时出错，请稍后再试");
+					}
+				});
+				}, 1500);
+			}
+			/**
+			 * 下拉刷新具体业务实现
+			 */
+			function pulldownRefresh() {
+				setTimeout(function() {
+					page=1;
+					getstatuspull();
+					mui('#pullrefresh').pullRefresh().endPulldown();					
+				}, 1500);
+			}
+			function getstatuspull() {
+				if (page!=1) {
+					page=1
+				}
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/getstatus1",
+					data:{uid:localStorage.getItem("localUserId"),page:page},
+					dataType: "json",
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							var str = "";
+							for(var d in datas) {
+								str += "<li class=\"mui-table-view-cell\">";
+								str += "<div class=\"mui-table\">";
+								str += "<div class=\"mui-table-cell mui-col-xs-8\">";
+								str += "<p><a href=\"javascript:void(0)\" onclick=\"checkStatus(\'" + datas[d].WarnResolveId + "','" + datas[d].Status + "\')\">" + data[d].Info + "</a></p>";
+//								str += "<p><a href=check"+ datas[d].Status + ".html?WarnResolveId=" + datas[d].WarnResolveId + "\>" + data[d].Info + "</a></p>";
+								str += "</div>";
+								str += "<div class=\"mui-table-cell mui-col-xs-4 mui-text-right\">";
+								str += "<span class=\"mui-h5\">" + formatyn(data[d].STime) + "</span></br>";
+								str += "<span class=\"mui-h5\">" + formtState(data[d].Status) + "</span>";
+								str += "</div>";
+								str += "</div>";
+								str += "</li>";
+							};
+							document.getElementById('ulcontent').innerHTML = str;
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("获取数据时出错，请稍后再试");
+					}
+				});
+			};
+			
+			function gocheckpage(u){
+				mui.openWindow({
+					url: u,
+				})
+			}
+
+			function checkStatus(id, status) {
+				mui.openWindow({
+					url: "check"+status+".html?WarnResolveId="+id,
+					id:"check"+status
+				})
+			};
+
+			//-------勘查-------
+			function checkinfo(id) {
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/getinfo" + "?WarnResolveId=" + id,
+					dataType: "json",
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							document.getElementById('WarnResolveId').innerText = datas.WarnResolveId;
+							document.getElementById('CoverNo').innerText = "井盖编号：" + datas.CoverNo;
+							//document.getElementById('STime').innerText="时间："+formatyn(datas.STime);
+							document.getElementById('Info').innerText = "详细内容：" + datas.Info;
+						}
+						scrollTo(0,0);
+						mui("#pullrefresh").pullRefresh().setStopped(true);
+//						mui('#pullrefresh').pullRefresh().disablePullupToRefresh();  //禁用上拉加载
+						//mui('#pullrefresh').pullRefresh().disablePulldownToRefresh();  //禁用下拉刷新  没有这个方法
+						document.getElementById('showinfo').style.display = 'block';
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("获取数据失败，请稍后重试");
+						//	                    var a = XMLHttpRequest.status;
+						//	                    var b = XMLHttpRequest.readyState;
+						//	                    var c = textStatus;
+					}
+				});
+			}
+
+			function kancha() {
+				var wrid = document.getElementById('WarnResolveId').innerText;
+				var Siturtion = document.getElementById('Siturtion').value.trim();
+				var WarnReason = document.getElementById('WarnReason').value.trim();
+				if(Siturtion == "" || WarnReason == "") {
+					plus.nativeUI.toast("请输入现场情况和故障原因");
+					return;
+				}
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/kancha",
+					dataType: "json",
+					data: {
+						id: wrid,
+						Siturtion: Siturtion,
+						WarnReason: WarnReason
+					},
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							if(datas.status == "success") {
+								plus.nativeUI.toast("提交成功");
+								getstatus1(); //刷新页面
+								close(); //关闭窗口
+							} else {
+								plus.nativeUI.toast("提交数据出错请重试");
+							}
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("提交数据出错请重试");
+						//	                    var a = XMLHttpRequest.status;
+						//	                    var b = XMLHttpRequest.readyState;
+						//	                    var c = textStatus;
+					}
+				});
+			}
+			//--------------
+//			var list = document.querySelector('.mui-table-view.mui-table-view-radio');
+//			list.addEventListener('selected', function(e) {
+//				var t = e.detail.el.innerText.trim();
+//				if(t == "能够现场处理") {
+//					document.getElementById('p').innerHTML = "<p>处理方法:</p><textarea id=\"Method\" class=\"noscrollbars\" onkeyup=\"autoGrow(this);\"></textarea>";
+//					document.getElementById('p').innerHTML += "<button class=\"mui-btn mui-btn-block mui-btn-primary\" onclick=\"finish()\">处理完成</button>";
+//				} else {
+//					document.getElementById('p').innerHTML = "<p>处理进度情况:</p><textarea id=\"Progress\" class=\"noscrollbars\" onkeyup=\"autoGrow(this);\"></textarea>";
+//					document.getElementById('p').innerHTML += "<button class=\"mui-btn mui-btn-block mui-btn-primary\" onclick=\"Progressing()\">处理中</button>";
+//				}
+//			});
+			//勘查完成未处理 
+			//______________________
+			function checkSiturtion(id) {
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/getinfo" + "?WarnResolveId=" + id,
+					dataType: "json",
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							document.getElementById('WarnResolveId2').innerText = datas.WarnResolveId;
+							document.getElementById('CoverNo2').innerText = "井盖编号：" + datas.CoverNo;
+							document.getElementById('Info2').innerText = "详细内容：" + datas.Info;
+							document.getElementById('Siturtion2').innerText = "现场情况：" + datas.Siturtion;
+							document.getElementById('WarnReason2').innerText = "故障原因：" + datas.WarnReason;
+						}
+						scrollTo(0,0);
+						document.getElementById('showSiturtion').style.display = 'block';
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("获取数据失败，请稍后重试");
+					}
+				});
+			}
+
+			function checkProgress(id) {
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/getinfo" + "?WarnResolveId=" + id,
+					dataType: "json",
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							document.getElementById('WarnResolveId3').innerText = datas.WarnResolveId;
+							document.getElementById('CoverNo3').innerText = "井盖编号：" + datas.CoverNo;
+							document.getElementById('Info3').innerText = "详细内容：" + datas.Info;
+							document.getElementById('Siturtion3').innerText = "现场情况：" + datas.Siturtion;
+							document.getElementById('WarnReason3').innerText = "故障原因：" + datas.WarnReason;
+							document.getElementById('Progress3').innerText = "处理进度情况：" + datas.Progress;
+						}
+						scrollTo(0,0);
+						document.getElementById('showProgress').style.display = 'block';
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("获取数据失败，请稍后重试");
+					}
+				});
+			}
+
+			function checkMethod(id) {
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/getinfo" + "?WarnResolveId=" + id,
+					dataType: "json",
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							document.getElementById('WarnResolveId4').innerText = datas.WarnResolveId;
+							document.getElementById('CoverNo4').innerText = "井盖编号：" + datas.CoverNo;
+							document.getElementById('Info4').innerText = "详细内容：" + datas.Info;
+							document.getElementById('Siturtion4').innerText = "现场情况：" + datas.Siturtion;
+							document.getElementById('WarnReason4').innerText = "故障原因：" + datas.WarnReason;
+							if(datas.Progress == "" || datas.Progress == null) {
+								document.getElementById('Progress4').innerText = "";
+							} else {
+								document.getElementById('Progress4').innerText = "处理进度情况：" + datas.Progress;
+							}
+							document.getElementById('Method4').innerText = "处理方法：" + datas.Method;
+							document.getElementById('ETime4').innerText = "完成时间：" + formatyn(datas.ETime);
+						}
+						scrollTo(0,0);
+						document.getElementById('showMethod').style.display = 'block';
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("获取数据失败，请稍后重试");
+					}
+				});
+			}
+			//
+			//——————————————————————————————
+			function Progressing() {
+				var btnArray = ['否', '是'];
+				mui.confirm('填写完成提交，确定？', '', btnArray, function(e) {
+					if(e.index == 1) {
+				var wrid = document.getElementById('WarnResolveId2').innerText;
+				var Progress = document.getElementById('Progress').value.trim();
+				if(Progress == "") {
+					plus.nativeUI.toast("请输入处理进度情况");
+					return;
+				}
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/repair",
+					dataType: "json",
+					data: {
+						id: wrid,
+						Progress: Progress
+					},
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							if(datas.status == "success") {
+								plus.nativeUI.toast("提交成功");
+								getstatus1(); //刷新页面
+								close2(); //关闭窗口
+							} else {
+								plus.nativeUI.toast("提交数据出错请重试");
+							}
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("提交数据出错请重试");
+					}
+				});
+				}else{}})
+			}
+
+			function finish() {
+				var btnArray = ['否', '是'];
+				mui.confirm('填写完成提交，确定？', '', btnArray, function(e) {
+					if(e.index == 1) {
+				var wrid = document.getElementById('WarnResolveId2').innerText;
+				var Method = document.getElementById('Method').value.trim();
+				if(Method == "") {
+					plus.nativeUI.toast("请输入处理方法");
+					return;
+				}
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/finish",
+					dataType: "json",
+					data: {
+						id: wrid,
+						Method: Method
+					},
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							if(datas.status == "success") {
+								plus.nativeUI.toast("提交成功");
+								getstatus1(); //刷新页面
+								close2(); //关闭窗口
+							} else {
+								plus.nativeUI.toast("提交数据出错请重试");
+							}
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("提交数据出错请重试");
+					}
+				});
+				}else{}})
+			}
+
+			function finish2() {
+				var btnArray = ['否', '是'];
+				mui.confirm('填写完成提交，确定？', '', btnArray, function(e) {
+					if(e.index == 1) {
+				var wrid = document.getElementById('WarnResolveId3').innerText;
+				var Method = document.getElementById('Method3').value.trim();
+				if(Method == "") {
+					plus.nativeUI.toast("请输入处理方法");
+					return;
+				}
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/finish",
+					dataType: "json",
+					data: {
+						id: wrid,
+						Method: Method
+					},
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							if(datas.status == "success") {
+								plus.nativeUI.toast("提交成功");
+								getstatus1(); //刷新页面
+								close3(); //关闭窗口
+							} else {
+								plus.nativeUI.toast("提交数据出错请重试");
+							}
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("提交数据出错请重试");
+					}
+				});
+				}else{}})
+			}
+
+
+			//--退出
+			var first = null;
+			mui.back = function() {
+				if(!first) {
+					first = new Date().getTime();
+					plus.nativeUI.toast("再按一次退出应用");
+					setTimeout(function() {
+						first = null;
+					}, 1000);
+				} else {
+					if(new Date().getTime() - first < 1000) {
+						plus.runtime.quit(); //退出客户端程序  
+					}
+				}
+			};
+			//				mui.plusReady(function() {
+			//					// 在这里调用plus api
+			//					plus.key.addEventListener('backbutton', function() {
+			//						window.location.href = "main.html";
+			//					})
+			//				});
+		</script>
+	</body>
+
+</html>

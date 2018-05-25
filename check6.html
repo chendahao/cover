@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" type="text/css" href="css/mui.min.css" />
+		<style type="text/css">
+			.mui-table h4,
+			.mui-table h5,
+			.mui-table .mui-h5,
+			.mui-table .mui-h6,
+			.mui-table p {
+				margin-top: 0;
+			}
+			
+			.mui-table h4 {
+				line-height: 21px;
+				font-weight: 500;
+			}
+			
+			.mui-table .oa-icon {
+				position: absolute;
+				right: 0;
+				bottom: 0;
+			}
+			
+			.mui-table .oa-icon-star-filled {
+				color: #f14e41;
+			}
+			
+			textarea.noscrollbars {
+				overflow: hidden;
+				width: 100%;
+				height: 80px;
+			}
+			
+			html,
+			body {
+				background-color: #efeff4;
+			}
+			
+			.title {
+				margin: 20px 15px 10px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+			
+			a:link {
+				color: #000000;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div id="showMethod" style="position:fixed; top:0; left:0;width: 100%; height: 100%; background-color: #FFF; overflow-y: auto;">
+			<header id="header" class="mui-bar" style="height: 44px;display: block;">
+				<a class="mui-icon mui-icon-back mui-pull-left" style="color: #999; " onclick="gotoMain()"></a>
+				<!--<a id="gocheck5" class="mui-icon mui-pull-right" style="color: #999;font-size: 20px ;margin-top: 10px;">上一步</a>-->
+				<h1 class="mui-title">相关内容</h1>
+			</header>
+			<div id="" style="margin-top: 45px;">
+				<fieldset>
+					<legend>详细信息</legend>
+					<p id="WarnResolveId" style="display: none;"></p>
+					<p id="CoverNo"></p>
+					<p id="Info"></p>
+					<p id="Siturtion"></p>
+					<p id="Progress"></p>
+				</fieldset>
+				<div id="p" style="margin: 0px auto; width: 98%;">
+					<!--<p class='mui-content-padded'>:</p>-->
+					<!--<textarea id="Method" class="noscrollbars" onkeyup="autoGrow(this);"></textarea>-->
+					<button class="mui-btn mui-btn-block mui-btn-primary" onclick="gos(7)">开始施工</button>
+				</div>
+			</div>
+		</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<!--<script src="js/jquery.min.js"></script>-->
+		<script src="js/baseData.js"></script>
+		<script type="text/javascript">
+			//正则表达式方法解析url中的数据
+			function GetQueryString(name) {
+				var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+				var r = window.location.search.substr(1).match(reg);
+				if(r != null) return unescape(r[2]);
+				return null;
+			};
+			var id = GetQueryString("WarnResolveId");
+			if(id != null) {
+				checkinfo(id);
+			}
+
+			function checkinfo(id) {
+				mui.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/getinfo" + "?WarnResolveId=" + id,
+					dataType: "json",
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							document.getElementById('WarnResolveId').innerText = datas.WarnResolveId;
+							document.getElementById('CoverNo').innerText = "井盖编号：" + datas.CoverNo;
+							//document.getElementById('STime').innerText="时间："+formatyn(datas.STime);
+							document.getElementById('Info').innerText = "详细内容：" + datas.Info;
+							document.getElementById('Siturtion').innerText = "现场情况：" + datas.Siturtion;
+							document.getElementById('Progress').innerText = "处理进度：" + datas.Progress;
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("获取数据失败，请稍后重试");
+					}
+				});
+			}
+			function gos(status) {
+				var btnArray = ['否', '是'];
+				mui.confirm('填写完成提交，确定？', '', btnArray, function(e) {
+					if(e.index == 1) {
+				var wrid = document.getElementById('WarnResolveId').innerText;
+				var Progress = ";开始施工";
+				mui.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/gos",
+					dataType: "json",
+					data: {
+						id: wrid,
+						Progress: Progress,
+						Status:status
+					},
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							if(datas.status == "success") {
+								plus.nativeUI.toast("提交成功");
+								//返回到index
+								mui.openWindow({
+									url: "index.html",
+								})
+							} else {
+								plus.nativeUI.toast("提交数据出错请重试");
+							}
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("提交数据出错请重试");
+					}
+				});
+				}else{}})
+			}
+		</script>
+	</body>
+
+</html>

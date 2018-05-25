@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" type="text/css" href="css/mui.min.css" />
+		<style type="text/css">
+			.mui-table h4,
+			.mui-table h5,
+			.mui-table .mui-h5,
+			.mui-table .mui-h6,
+			.mui-table p {
+				margin-top: 0;
+			}
+			
+			.mui-table h4 {
+				line-height: 21px;
+				font-weight: 500;
+			}
+			
+			.mui-table .oa-icon {
+				position: absolute;
+				right: 0;
+				bottom: 0;
+			}
+			
+			.mui-table .oa-icon-star-filled {
+				color: #f14e41;
+			}
+			
+			textarea.noscrollbars {
+				overflow: hidden;
+				width: 100%;
+				height: 80px;
+			}
+			
+			html,
+			body {
+				background-color: #efeff4;
+			}
+			
+			.title {
+				margin: 20px 15px 10px;
+				color: #6d6d72;
+				font-size: 15px;
+			}
+			
+			a:link {
+				color: #000000;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div id="showSiturtion" style="position:fixed; top:0; left:0;width: 100%; height: 100%; background-color: #FFF;">
+			<header id="header" class="mui-bar" style="height: 44px;">
+				<a id="closeinfo" class="mui-icon mui-icon-back mui-pull-left" style="color: #999; " onclick="gotoMain()"></a>
+				<a href="javascript:void(0)" onclick="gocheck1()" class="mui-icon mui-pull-right" style="color: #999;font-size: 20px ;margin-top: 10px;">上一步</a>
+				<h1 class="mui-title">相关内容</h1>
+			</header>
+			<div id="" style="margin-top: 47px;">
+				<fieldset>
+					<legend>详细信息</legend>
+					<p id="WarnResolveId" style="display: none;"></p>
+					<p id="CoverNo"></p>
+					<p id="Info"></p>
+					<p id="Siturtion"></p>
+				</fieldset>
+				<div>
+					<!--<label>能够现场处理</label>-->
+					<!--<input id="checkbox1" type="checkbox" onclick="checkboxStat()">-->
+					<ul class="mui-table-view mui-table-view-radio">
+						<li class="mui-table-view-cell">
+							<a class="mui-navigate-right">能够现场处理</a>
+						</li>
+						<li class="mui-table-view-cell">
+							<a class="mui-navigate-right">不能现场处理</a>
+						</li>
+					</ul>
+				</div>
+				<div id="p" style="margin: 0px auto; width: 98%;">
+					<!--<p>处理进度情况:</p>
+					<textarea id="Progress" class="noscrollbars" onkeyup="autoGrow(this);"></textarea>
+					<button  class="mui-btn mui-btn-block mui-btn-primary" onclick="Progressing()">处理中</button>-->
+				</div>
+			</div>
+			</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/jquery.min.js"></script>
+		<script src="js/baseData.js"></script>
+		<script type="text/javascript">
+			//正则表达式方法解析url中的数据
+			function GetQueryString(name) {
+				var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+				var r = window.location.search.substr(1).match(reg);
+				if(r != null) return unescape(r[2]);
+				return null;
+			};
+			var id = GetQueryString("WarnResolveId");
+			if(id != null) {
+				checkinfo(id);
+			}
+
+			function checkinfo(id) {
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/getinfo" + "?WarnResolveId=" + id,
+					dataType: "json",
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							document.getElementById('WarnResolveId').innerText = datas.WarnResolveId;
+							document.getElementById('CoverNo').innerText = "井盖编号：" + datas.CoverNo;
+							//document.getElementById('STime').innerText="时间："+formatyn(datas.STime);
+							document.getElementById('Info').innerText = "详细内容：" + datas.Info;
+							document.getElementById('Siturtion').innerText = "现场情况：" + datas.Siturtion;
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("获取数据失败，请稍后重试");
+						//	                    var a = XMLHttpRequest.status;
+						//	                    var b = XMLHttpRequest.readyState;
+						//	                    var c = textStatus;
+					}
+				});
+			}
+			
+			var list = document.querySelector('.mui-table-view.mui-table-view-radio');
+			list.addEventListener('selected', function(e) {
+				var t = e.detail.el.innerText.trim();
+				if(t == "能够现场处理") {
+					document.getElementById('p').innerHTML = "<p class='mui-content-padded'>处理方法:</p><textarea id=\"Method\" class=\"noscrollbars\" onkeyup=\"autoGrow(this);\"></textarea>";
+					document.getElementById('p').innerHTML += "<button class=\"mui-btn mui-btn-block mui-btn-primary\" onclick=\"finish()\">处理完成</button>";
+				} else {
+					//不能现场处理				
+					document.getElementById('p').innerHTML = "<button class=\"mui-btn mui-btn-block mui-btn-primary\" onclick=\"Progressing()\">下一步</button>";
+				}
+			});
+			//
+			function finish() {
+				var btnArray = ['否', '是'];
+				mui.confirm('填写完成提交，确定？', '', btnArray, function(e) {
+					if(e.index == 1) {
+				var wrid = document.getElementById('WarnResolveId').innerText;
+				var Method = document.getElementById('Method').value.trim();
+				if(Method == "") {
+					plus.nativeUI.toast("请输入处理方法");
+					return;
+				}
+				$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/finish",
+					dataType: "json",
+					data: {
+						id: wrid,
+						Method: Method
+					},
+					success: function(data) {
+						if(data != null) {
+							var datas = eval(data);
+							if(datas.status == "success") {
+								plus.nativeUI.toast("提交成功");
+								//返回到index
+								mui.openWindow({
+									url: "index.html",
+								})
+							} else {
+								plus.nativeUI.toast("提交数据出错请重试");
+							}
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("提交数据出错请重试");
+					}
+				});
+				}else{}})
+			}
+			function gocheck1(){
+				var wrid = document.getElementById('WarnResolveId').innerText;
+				window.location.href="check1.html?WarnResolveId=" + wrid;
+//				mui.openWindow({
+//					url: "check1.html?WarnResolveId=" + wrid,
+//				})
+			}
+			function Progressing() {
+				var wrid = document.getElementById('WarnResolveId').innerText;
+				mui.openWindow({
+					url: "check3.html?WarnResolveId=" + wrid,
+					id:"check3"
+				})
+//				var Progress = document.getElementById('Progress').value.trim();
+//				if(Progress == "") {
+//					plus.nativeUI.toast("请输入处理进度情况");
+//					return;
+//				}
+//				$.ajax({
+//					type: "get",
+//					url: baseUrl + "/WarnResolve/repair",
+//					dataType: "json",
+//					data: {
+//						id: wrid,
+//						Progress: Progress
+//					},
+//					success: function(data) {
+//						if(data != null) {
+//							var datas = eval(data);
+//							if(datas.status == "success") {
+//								plus.nativeUI.toast("提交成功");
+//								getstatus1(); //刷新页面
+//								close2(); //关闭窗口
+//							} else {
+//								plus.nativeUI.toast("提交数据出错请重试");
+//							}
+//						}
+//					},
+//					error: function(XMLHttpRequest, textStatus, errorThrown) {
+//						plus.nativeUI.toast("提交数据出错请重试");
+//					}
+//				});
+		}
+		</script>
+	</body>
+
+</html>

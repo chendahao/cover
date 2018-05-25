@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>GUIDE</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="css/mui.min.css">
+		<script type="text/javascript" src="js/ol.js"></script>
+		<script type="text/javascript" src="js/baseData.js"></script>
+		<script src="js/jquery.min.js"></script>
+		<script src="js/mui.min.js"></script>
+		<style>
+			#cbox {
+				width: 160px;
+				position: fixed;
+				bottom: 3%;
+				margin-left: 3%;
+			}
+			.up {
+				position: absolute;
+				width: 160px;
+				left: 50%;
+				margin-left: -80px;
+				bottom: 10%;
+				text-align: center;
+			}
+			
+			.btn {
+				position: absolute;
+				width: 160px;
+				left: 50%;
+				margin-left: -80px;
+				bottom: 10%;
+			}
+			
+			#close {
+				width: 160px;
+				left: 50%;
+				margin-left: -80px;
+				top: 20%;
+				padding: 10px;
+				color: #fff;
+				border-color: #fff;
+				margin-top: 0px;
+			}
+			
+			.item-logo {
+				width: 100%;
+				height: 100%;
+				position: relative;
+			}
+			
+			.item-logo a {
+				width: 150px;
+				height: 150px;
+				display: block;
+				border: 1px solid #FFFFFF;
+				border-color: rgba(255, 255, 255, 0.5);
+				text-align: center;
+				line-height: 150px;
+				border-radius: 50%;
+				font-size: 40px;
+				color: #fff;
+				position: absolute;
+				top: 10%;
+				left: 50%;
+				margin-left: -75px;
+			}
+			
+			.animate {
+				position: absolute;
+				left: 0;
+				top: 12%;
+				width: 100%;
+				color: #fff;
+				display: -moz-box;
+			}
+			
+			.animate h2 {
+				text-align: center;
+				margin-top: 180px;
+			}
+			
+			.animate li {
+				width: 94%;
+				height: 40px;
+				line-height: 40px;
+				list-style: none;
+				font-size: 13px;
+				text-align: center;
+				margin-left: 3%;
+			}
+			
+			.animated {
+				-webkit-animation-duration: 1s;
+				-webkit-animation-play-state: paused;
+				-webkit-animation-fill-mode: both;
+			}
+			
+			.guide-show .bounceInDown {
+				-webkit-animation-name: bounceInDown;
+				-webkit-animation-play-state: running;
+				-webkit-animation-delay: 1s;
+				display: block;
+			}
+			
+			.guide-show .bounceInLeft {
+				-webkit-animation-name: bounceInLeft;
+				display: block;
+				-webkit-animation-play-state: running;
+			}
+			
+			.guide-show .bounceInRight {
+				-webkit-animation-name: bounceInRight;
+				display: block;
+				-webkit-animation-play-state: running;
+				-webkit-animation-delay: 0.5s;
+			}
+			
+			@-webkit-keyframes bounceInDown {
+				0%,
+				60%,
+				75%,
+				90%,
+				100% {
+					-webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+					animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+				}
+				0% {
+					opacity: 0;
+					-webkit-transform: translate3d(0, -3000px, 0);
+					transform: translate3d(0, -3000px, 0);
+				}
+				60% {
+					opacity: 1;
+					-webkit-transform: translate3d(0, 25px, 0);
+					transform: translate3d(0, 25px, 0);
+				}
+				75% {
+					-webkit-transform: translate3d(0, -5px, 0);
+					transform: translate3d(0, -5px, 0);
+				}
+				90% {
+					-webkit-transform: translate3d(0, 3px, 0);
+					transform: translate3d(0, 3px, 0);
+				}
+				100% {
+					-webkit-transform: none;
+					transform: none;
+				}
+			}
+			
+			@-webkit-keyframes bounceInLeft {
+				0%,
+				60%,
+				75%,
+				90%,
+				100% {
+					-webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+					animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+				}
+				0% {
+					opacity: 0;
+					-webkit-transform: translate3d(-3000px, 0, 0);
+					transform: translate3d(-3000px, 0, 0);
+				}
+				60% {
+					opacity: 1;
+					-webkit-transform: translate3d(25px, 0, 0);
+					transform: translate3d(25px, 0, 0);
+				}
+				75% {
+					-webkit-transform: translate3d(-10px, 0, 0);
+					transform: translate3d(-10px, 0, 0);
+				}
+				90% {
+					-webkit-transform: translate3d(5px, 0, 0);
+					transform: translate3d(5px, 0, 0);
+				}
+				100% {
+					-webkit-transform: none;
+					transform: none;
+				}
+			}
+			
+			@-webkit-keyframes bounceInRight {
+				0%,
+				60%,
+				75%,
+				90%,
+				100% {
+					-webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+					animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+				}
+				0% {
+					opacity: 0;
+					-webkit-transform: translate3d(3000px, 0, 0);
+					transform: translate3d(3000px, 0, 0);
+				}
+				60% {
+					opacity: 1;
+					-webkit-transform: translate3d(-25px, 0, 0);
+					transform: translate3d(-25px, 0, 0);
+				}
+				75% {
+					-webkit-transform: translate3d(10px, 0, 0);
+					transform: translate3d(10px, 0, 0);
+				}
+				90% {
+					-webkit-transform: translate3d(-5px, 0, 0);
+					transform: translate3d(-5px, 0, 0);
+				}
+				100% {
+					-webkit-transform: none;
+					transform: none;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="slider" class="mui-slider mui-fullscreen" style="background-color: black;">
+			<div class="mui-slider-group">
+				<!-- 第四张 -->
+				<div class="mui-slider-item">
+					<div class="item-logo" style="background-color: #D74B28;">
+						<a href="#">
+							曹妃甸
+						</a>
+
+						<div class="animate guide-show">
+							<h2 class="animated bounceInDown">船舶智能指挥服务系统</h2>
+							<li class="animated bounceInLeft">1、本系统仅作参考，请按实际交通规则行驶。</li>
+							<li class="animated bounceInLeft">2、因本系统而违反交通规则，本系统不负任何责任。</li>
+							<li class="animated bounceInRight">3、海上实际情况可能与本系统不同。</li>
+							<li class="animated bounceInRight">4、路线导航提供的路线仅供参考。</li>
+
+						</div>
+						<div class="btn" id="nextBtn">
+							<!--<button id='close' class="mui-btn mui-btn-warning mui-btn-outlined" style="display: none;" onclick="window.location.href='index3.html';">立即体验</button>-->
+							<button id='close' class="mui-btn mui-btn-warning mui-btn-outlined" style="display: none;">立即体验</button>
+							<div class="mui-checkbox">
+							<div id="cbox" class="mui-input-row mui-checkbox text-center mui-text-center"style="display: none;">
+								<label for="checkb">同意使用条款</label>
+								<input id="checkb" name="checkbox" type="checkbox">
+							</div>
+						</div>
+						</div>
+						<div class="up" id="checkP">
+							<p id="checkpinfo">正在检查系统更新
+								<p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			mui.plusReady(function() {
+				if(mui.os.ios) {
+					plus.navigator.setFullscreen(true);
+				}
+				plus.navigator.closeSplashscreen();
+				if(plus.networkinfo.getCurrentType() == 1) {
+					mui.toast('当前没有连接网络', {
+						duration: '4000',
+						type: 'div'
+					}) //弹出式提示框
+				}
+			});
+
+			//立即体验按钮点击事件
+			document.getElementById("close").addEventListener('click', function(event) {
+				//guide标识，显示guide页面后 true
+				plus.storage.setItem("launchFlag", "true");
+				//预加载index3
+				setTimeout(function() {
+					var page = mui.preload({
+						url: "index3.html",
+						id: "index3",
+					});
+				}, 0.001);
+				mui.openWindow({
+					url: "index3.html",
+					id: "index3",
+				})
+
+			}, false);
+
+			//图片切换时，触发动画
+			document.querySelector('.mui-slider').addEventListener('slide', function(event) {
+				//注意slideNumber是从0开始的；
+				var index = event.detail.slideNumber + 1;
+				if(index == 2 || index == 3) {
+					var item = document.getElementById("tips-" + index);
+					if(item.classList.contains("mui-hidden")) {
+						item.classList.remove("mui-hidden");
+						item.classList.add("guide-show");
+					}
+				}
+			});
+			//重写mui.back方法，一秒内连续点两次返回退出
+			var first = null;
+			mui.back = function() {
+				if(!first) {
+					first = new Date().getTime();
+					plus.nativeUI.toast("再按一次退出应用");
+					setTimeout(function() {
+						first = null;
+					}, 1000);
+				} else {
+					if(new Date().getTime() - first < 1000) {
+						plus.runtime.quit(); //退出客户端程序  
+					}
+				}
+			};
+		</script>
+	</body>
+	<script type="text/javascript">
+		var Versionlocal; //当地程序版本
+		var VersionServer; //服务器程序版本
+		//检查服务器中的程序版本
+		document.addEventListener('plusready', VersionServerNo());
+
+		var checkurl;
+
+		function VersionServerNo() {
+			checkurl = baseUrl;
+			$.ajax({
+				type: "get",
+				url: checkurl + "/version/GetVersionServerNO",
+				async: false,
+				dataType: "json",
+				timeout: 6000,
+				success: function(data) {
+					VersionServer = data.Version;
+				},
+				complete: function(XMLHttpRequest, status) { //请求完成后最终执行参数
+					if(status == 'timeout') { //超时,status还有success,error等值的情况
+						setTimeout(showcolse, 3000);
+					}　　
+				}
+			});
+		};
+
+		//关闭正在检查字样，显示按钮
+		function showcolse() {
+			document.getElementById('checkpinfo').style.display = 'none';
+			document.getElementById('cbox').style.display = 'block';
+		}
+		//同意条款点击事件
+		document.getElementById('checkb').addEventListener('click',function(){
+			if(document.getElementById('checkb').checked){
+				document.getElementById('close').style.display = 'block';
+			}else{
+				document.getElementById('close').style.display = 'none';
+			}
+		})
+
+		//当地版本号
+		//document.addEventListener('plusready',getVersion,false);
+		function getVersion() {
+			Versionlocal = plus.runtime.version;
+			//发布前显示，hbuilder版本号，发布后正常	
+			//如果服务器版本大于当地版本则update
+			console.log(VersionServer + "," + Versionlocal);
+			if(VersionServer * 1 > Versionlocal * 1) {
+				alert("有新版本可用，即将升级");
+				if(window.plus) {
+					Update();
+				} else {
+					document.addEventListener("plusready", Update, false);
+				}
+			} else {
+				setTimeout(showcolse, 3000);
+				//数据检测取消，仅保留版本更新
+				//getFileVersion();
+			}
+		};
+
+
+		//更新程序
+		function Update() {
+			var url = checkurl + "/Files/" + VersionServer + ".apk";
+			//下载更新程序的地址
+			var path;
+			var dtast = plus.downloader.createDownload(url, {}, function(d, status) {
+				var nwaiting = plus.nativeUI.showWaiting("更新中...");
+				if(status == 200) { //下载成功
+					path = d.filename; //filename 下载时保存的路径
+					//安装下载的程序
+					alert("下载成功");
+					plus.runtime.install(path);
+				} else {
+					alert("下载程序时出错:" + status)
+				}
+			});
+			dtast.start();
+		}	
+	</script>
+
+</html>

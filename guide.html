@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>GUIDE</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+		<link rel="stylesheet" href="../css/mui.min.css">
+		<style>
+			#cbox {
+				width: 160px;
+				position: fixed;
+				bottom: 7%;
+				margin-left: 30%;
+			}
+			
+			#close {
+				position: absolute;
+				width: 160px;
+				left: 50%;
+				margin-left: -80px;
+				bottom: 15%;
+				padding: 10px;
+				color: #fff;
+				border-color: #fff;
+			}
+			
+			.item-logo {
+				width: 100%;
+				height: 100%;
+				position: relative;
+			}
+			
+			.item-logo a {
+				width: 200px;
+				height: 200px;
+				display: block;
+				border: 1px solid #FFFFFF;
+				border-color: rgba(255, 255, 255, 0.5);
+				text-align: center;
+				line-height: 200px;
+				border-radius: 50%;
+				font-size: 40px;
+				color: #fff;
+				position: absolute;
+				top: 15%;
+				left: 50%;
+				margin-left: -100px;
+			}
+			
+			.animate {
+				position: absolute;
+				left: 0;
+				bottom: 15%;
+				width: 100%;
+				color: #fff;
+				display: -moz-box;
+			}
+			
+			.animate h2 {
+				text-align: center;
+				margin-bottom: 20px;
+			}
+			
+			.animate li {
+				width: 50%;
+				height: 30px;
+				line-height: 30px;
+				list-style: none;
+				font-size: 16px;
+				text-align: right;
+			}
+			
+			.animate li:nth-child(3) {
+				text-align: left;
+				float: right;
+			}
+			
+			.animated {
+				-webkit-animation-duration: 1s;
+				-webkit-animation-play-state: paused;
+				-webkit-animation-fill-mode: both;
+			}
+			
+			.guide-show .bounceInDown {
+				-webkit-animation-name: bounceInDown;
+				-webkit-animation-play-state: running;
+				-webkit-animation-delay: 1s;
+				display: block;
+			}
+			
+			.guide-show .bounceInLeft {
+				-webkit-animation-name: bounceInLeft;
+				display: block;
+				-webkit-animation-play-state: running;
+			}
+			
+			.guide-show .bounceInRight {
+				-webkit-animation-name: bounceInRight;
+				display: block;
+				-webkit-animation-play-state: running;
+				-webkit-animation-delay: 0.5s;
+			}
+			
+			@-webkit-keyframes bounceInDown {
+				0%,
+				60%,
+				75%,
+				90%,
+				100% {
+					-webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+					animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+				}
+				0% {
+					opacity: 0;
+					-webkit-transform: translate3d(0, -3000px, 0);
+					transform: translate3d(0, -3000px, 0);
+				}
+				60% {
+					opacity: 1;
+					-webkit-transform: translate3d(0, 25px, 0);
+					transform: translate3d(0, 25px, 0);
+				}
+				75% {
+					-webkit-transform: translate3d(0, -5px, 0);
+					transform: translate3d(0, -5px, 0);
+				}
+				90% {
+					-webkit-transform: translate3d(0, 3px, 0);
+					transform: translate3d(0, 3px, 0);
+				}
+				100% {
+					-webkit-transform: none;
+					transform: none;
+				}
+			}
+			
+			@-webkit-keyframes bounceInLeft {
+				0%,
+				60%,
+				75%,
+				90%,
+				100% {
+					-webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+					animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+				}
+				0% {
+					opacity: 0;
+					-webkit-transform: translate3d(-3000px, 0, 0);
+					transform: translate3d(-3000px, 0, 0);
+				}
+				60% {
+					opacity: 1;
+					-webkit-transform: translate3d(25px, 0, 0);
+					transform: translate3d(25px, 0, 0);
+				}
+				75% {
+					-webkit-transform: translate3d(-10px, 0, 0);
+					transform: translate3d(-10px, 0, 0);
+				}
+				90% {
+					-webkit-transform: translate3d(5px, 0, 0);
+					transform: translate3d(5px, 0, 0);
+				}
+				100% {
+					-webkit-transform: none;
+					transform: none;
+				}
+			}
+			
+			@-webkit-keyframes bounceInRight {
+				0%,
+				60%,
+				75%,
+				90%,
+				100% {
+					-webkit-animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+					animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+				}
+				0% {
+					opacity: 0;
+					-webkit-transform: translate3d(3000px, 0, 0);
+					transform: translate3d(3000px, 0, 0);
+				}
+				60% {
+					opacity: 1;
+					-webkit-transform: translate3d(-25px, 0, 0);
+					transform: translate3d(-25px, 0, 0);
+				}
+				75% {
+					-webkit-transform: translate3d(10px, 0, 0);
+					transform: translate3d(10px, 0, 0);
+				}
+				90% {
+					-webkit-transform: translate3d(-5px, 0, 0);
+					transform: translate3d(-5px, 0, 0);
+				}
+				100% {
+					-webkit-transform: none;
+					transform: none;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="slider" class="mui-slider mui-fullscreen" style="background-color: black;">
+			<div class="mui-slider-group">
+				<!-- 第一张 -->
+				<div class="mui-slider-item">
+					<div class="item-logo" style="background-color: #D74B28">
+						<a href="#">
+							曹妃甸
+						</a>
+						<div class="animate guide-show">
+							<h2 class="animated bounceInDown">环渤海经济圈中心地带</h2>
+							<li class="animated bounceInLeft">保持高速增长态势</li>
+							<li class="animated bounceInRight">在“北煤南运”中起到重要作用</li>
+						</div>
+					</div>
+				</div>
+				<!-- 第二张 -->
+				<div class="mui-slider-item">
+					<div class="item-logo" style="background-color: #02C1ED;">
+						<a href="#">
+							曹妃甸港
+						</a>
+						<div id="tips-2" class="animate mui-hidden">
+							<h2 class="animated bounceInDown">西起双龙河口、东至青龙河口</h2>
+							<li class="animated bounceInLeft">以人工岛为主体</li>
+							<li class="animated bounceInRight">以板块结构为特征</li>
+						</div>
+					</div>
+				</div>
+				<!-- 第三张 -->
+				<div class="mui-slider-item">
+					<div class="item-logo" style="background-color: #67C962;">
+						<a href="#">
+							交通服务
+						</a>
+						<div id="tips-3" class="animate mui-hidden">
+							<h2 class="animated bounceInDown">曹妃甸船舶智能指挥服务系统</h2>
+							<li class="animated bounceInLeft">安全、公平、高效的船舶交通环境</li>
+							<li class="animated bounceInRight">科学化和现代化的管理水平</li>
+						</div>
+					</div>
+				</div>
+				<!-- 第四张 -->
+				<div class="mui-slider-item">
+					<div class="item-logo" style="background-color: #FCD208;">
+						<a href="#">
+							移动服务
+						</a>
+						<div class="mui-checkbox">
+							<div id="cbox" class="mui-input-row mui-checkbox text-center mui-text-center">
+								<label for="checkb">同意使用条款</label>
+								<input id="checkb" name="checkbox" type="checkbox">
+							</div>
+						</div>
+						<div class="animate">
+							<button id='close' class="mui-btn mui-btn-warning mui-btn-outlined disabled">立即体验</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="mui-slider-indicator">
+				<div class="mui-indicator mui-active"></div>
+				<div class="mui-indicator"></div>
+				<div class="mui-indicator"></div>
+				<div class="mui-indicator"></div>
+			</div>
+		</div>
+		<script src="../js/mui.min.js"></script>
+		<script>
+			function plusReady() {
+				if(localStorage.firstfile == null) {
+					var path = "firstfile.zip"; // 路径_downloads/
+					var targetpath = "_doc/";
+					plus.zip.decompress(path, targetpath,
+						function() {});
+					localStorage.firstfile = 1;
+					//					window.location.href='index3.html';
+
+				} else {
+					//			getVersion();
+					//			window.location.href='index3.html';
+				};
+			}
+			mui.back = function() {};
+			mui.plusReady(function() {
+				if(mui.os.ios) {
+					plus.navigator.setFullscreen(true);
+				}
+				plus.navigator.closeSplashscreen();
+			});
+			//立即体验按钮点击事件
+			document.getElementById("close").addEventListener('tap', function(event) {
+				if(document.getElementById('checkb').checked) {
+					//guide标识，显示guide页面后 true
+					plus.storage.setItem("launchFlag", "true");
+					//plus.navigator.setFullscreen(false);
+					//plus.webview.currentWebview().close();
+					mui.openWindow({
+						url: "/index3.html",
+					})
+				}else{
+					plus.nativeUI.toast("请同意使用条款");
+				}
+
+			}, false);
+			//图片切换时，触发动画
+			document.querySelector('.mui-slider').addEventListener('slide', function(event) {
+				//注意slideNumber是从0开始的；
+				var index = event.detail.slideNumber + 1;
+				if(index == 2 || index == 3) {
+					var item = document.getElementById("tips-" + index);
+					if(item.classList.contains("mui-hidden")) {
+						item.classList.remove("mui-hidden");
+						item.classList.add("guide-show");
+					}
+				}
+			});
+		</script>
+	</body>
+
+</html>

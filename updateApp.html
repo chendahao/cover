@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+	</body>
+	<script type="text/javascript">
+		
+		//当地版本号
+		//document.addEventListener('plusready',getVersion,false);
+		function getVersion() {
+			Versionlocal = plus.runtime.version;
+			//发布前显示，hbuilder版本号，发布后正常	
+			//如果服务器版本大于当地版本则update
+//			console.log(VersionServer + "," + Versionlocal);
+			if(VersionServer * 1 > Versionlocal * 1) {
+				alert("有新版本可用，即将升级");
+				if(window.plus) {
+					Update();
+				} else {
+					document.addEventListener("plusready", Update, false);
+				}
+			} else {
+				setTimeout(showcolse, 3000);
+				//数据检测取消，仅保留版本更新
+				//getFileVersion();
+			}
+		};
+		
+		//更新程序
+		function Update() {
+			var url = checkurl + "/Files/" + VersionServer + ".apk";
+			//下载更新程序的地址
+			var path;
+			var dtast = plus.downloader.createDownload(url, {}, function(d, status) {
+				var nwaiting = plus.nativeUI.showWaiting("更新中...");
+				if(status == 200) { //下载成功
+					path = d.filename; //filename 下载时保存的路径
+					//安装下载的程序
+					alert("下载成功");
+					plus.runtime.install(path);
+				} else {
+					alert("下载程序时出错:" + status)
+				}
+			});
+			dtast.start();
+		}	
+	</script>
+</html>

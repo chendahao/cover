@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>已完成列表</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		<link rel="stylesheet" type="text/css" href="css/mui.min.css" />
+		<style type="text/css">
+			.mui-table h4,
+			.mui-table h5,
+			.mui-table .mui-h5,
+			.mui-table .mui-h6,
+			.mui-table p {
+				margin-top: 0;
+			}
+			
+			.mui-table h4 {
+				line-height: 21px;
+				font-weight: 500;
+			}
+			
+			.mui-table .oa-icon {
+				position: absolute;
+				right: 0;
+				bottom: 0;
+			}
+			
+			.mui-table .oa-icon-star-filled {
+				color: #f14e41;
+			}
+			textarea.noscrollbars {
+			  overflow: hidden;
+			  width: 100%;
+			  height: 80px;
+			}
+			a:link {
+		    	color:#000000;
+		    }
+		</style>
+	</head>
+	<body>
+		<!--<header class="mui-bar mui-bar-nav">
+			<a class="mui-icon mui-icon mui-icon mui-icon-reload mui-pull-left" style="color: #999;" href="javascript:refresh()"></a>
+			<a class="mui-icon mui-icon-home-filled mui-pull-right" style="color: #999;" href="main.html"></a>
+			<h1 class="mui-title">已完成列表</h1>
+		</header>-->
+		<div id="pullrefresh" class="mui-content" style="margin-top: 0px;">
+			<ul id="ulcontent" class="mui-table-view mui-table-view-striped mui-table-view-condensed">
+			</ul>
+		</div>
+		<div id="showMethod" style="position:fixed; top:0; left:0;width: 100%; height: 100%; background-color: #FFF; display: none;z-index: 100;overflow-y: auto;">
+			<header id="header" class="mui-bar" style="height: 44px;">
+				<a id="closeMethod" class="mui-icon mui-icon-close mui-pull-right" style="color: #999;"></a>
+				<h1 class="mui-title">相关内容</h1>
+			</header>
+			<div id="" style="margin-top: 45px;">
+				 <fieldset>
+				 	<legend>详细信息</legend>
+				 	<p id="WarnResolveId4" style="display: none;"></p>
+					<p id="CoverNo4"></p>
+					<p id="Info4"></p>
+					<p id="Siturtion4"></p>
+					<p id="WarnReason4"></p>
+					<p id="Progress4"></p>
+					<p id="Method4"></p>
+					<p id="ETime4"></p>
+				 </fieldset>				 
+			</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/jquery.min.js"></script>
+		<script src="js/baseData.js"></script>
+		<script type="text/javascript">
+			mui.init({
+				pullRefresh: {
+					container: '#pullrefresh',
+					down: {
+						style:'circle',
+//						offset: '45px',
+						callback: pulldownRefresh
+					},
+					up: {
+						auto:false,
+						contentrefresh: '正在加载...',
+						contentnomore:'没有更多数据了',
+						callback: pullupRefresh
+					}
+				}
+			});
+			
+				var page=1;
+				// 判断扩展API是否准备，否则监听'plusready'事件
+				if(window.plus){
+					plusReady();
+				}else{
+					document.addEventListener('plusready', plusReady, false);
+				}
+				function plusReady(){
+					setTimeout(function(){
+					},1000);
+				}	
+				function refresh(){
+					getstatus3();		
+					plus.nativeUI.toast("刷新成功");
+				}
+				getstatus3();
+				function getstatus3() {
+					if (page!=1) {
+						page=1
+					}
+					$.ajax({
+						type: "get",
+						url: baseUrl + "/WarnResolve/getstatus3",
+						data:{uid:localStorage.getItem("localUserId"),page:page},
+						dataType: "json",
+						success: function(data) {
+							if(data.status=='is null'){
+								mui('#pullrefresh').pullRefresh().endPullupToRefresh(true);
+								return;
+							}
+							if(data != null) {
+								var datas = eval(data);
+								var str='';
+//								var str = "<ul id=\"ulcontent\" class=\"mui-table-view mui-table-view-striped mui-table-view-condensed\">";
+								for(var d in datas) {
+									str += "<li class=\"mui-table-view-cell\">";
+									str += "<div class=\"mui-table\">";
+									str += "<div class=\"mui-table-cell mui-col-xs-8\">";
+									str += "<p><a href=\"javascript:void(0)\" onclick=\"checkMethod(\'" + datas[d].WarnResolveId + "\')\">" + data[d].Info + "</a></p>";
+									str += "</div>";
+									str += "<div class=\"mui-table-cell mui-col-xs-4 mui-text-right\">";
+									str += "<span class=\"mui-h5\">" + formatyn(data[d].STime) + "</span></br>";
+									str += "<span class=\"mui-h5\">" + formtState(data[d].Status) + "</span>";
+									str += "</div>";
+									str += "</div>";
+									str += "</li>";
+								};
+//								str += "</ul>";
+								document.getElementById('ulcontent').innerHTML = str;
+							}
+						},
+	                	error: function (XMLHttpRequest, textStatus, errorThrown) {
+	                    plus.nativeUI.toast("获取数据时出错，请稍后再试");
+	                }
+					});
+				};
+				
+			//上拉加载
+			function pullupRefresh() {
+				page++;
+				setTimeout(function() {
+					$.ajax({
+					type: "get",
+					url: baseUrl + "/WarnResolve/getstatus3",
+					data:{uid:localStorage.getItem("localUserId"),page:page},
+					dataType: "json",
+					success: function(data) {
+						if(data.status=='is null'){
+							mui('#pullrefresh').pullRefresh().endPullupToRefresh(true);
+							return;
+						}
+						if(data != null) {
+							var datas = eval(data);
+							var str = '';
+							
+							for(var d in datas) {
+								str += "<li class=\"mui-table-view-cell\">";
+								str += "<div class=\"mui-table\">";
+								str += "<div class=\"mui-table-cell mui-col-xs-8\">";
+								str += "<p><a href=\"javascript:void(0)\" onclick=\"checkMethod(\'" + datas[d].WarnResolveId + "\')\">" + data[d].Info + "</a></p>";
+								str += "</div>";
+								str += "<div class=\"mui-table-cell mui-col-xs-4 mui-text-right\">";
+								str += "<span class=\"mui-h5\">" + formatyn(data[d].STime) + "</span></br>";
+								str += "<span class=\"mui-h5\">" + formtState(data[d].Status) + "</span>";
+								str += "</div>";
+								str += "</div>";
+								str += "</li>";
+							};
+							
+							document.getElementById('ulcontent').innerHTML += str;
+							mui('#pullrefresh').pullRefresh().endPullupToRefresh(false);
+						}
+					},
+					error: function(XMLHttpRequest, textStatus, errorThrown) {
+						plus.nativeUI.toast("获取数据时出错，请稍后再试");
+					}
+				});
+				}, 1500);
+			}
+			
+			/**
+			 * 下拉刷新具体业务实现
+			 */
+			function pulldownRefresh() {
+				setTimeout(function() {
+					page=1;
+					getstatus3pull();
+					mui('#pullrefresh').pullRefresh().endPulldown();					
+				}, 1500);
+			}
+			function getstatus3pull() {
+					if (page!=1) {
+						page=1
+					}
+					$.ajax({
+						type: "get",
+						url: baseUrl + "/WarnResolve/getstatus3",
+						data:{uid:localStorage.getItem("localUserId"),page:page},
+						dataType: "json",
+						success: function(data) {
+							if(data.status=='is null'){
+								mui('#pullrefresh').pullRefresh().endPullupToRefresh(true);
+								return;
+							}
+							if(data != null) {
+								var datas = eval(data);
+								var str = '';
+								for(var d in datas) {
+									str += "<li class=\"mui-table-view-cell\">";
+									str += "<div class=\"mui-table\">";
+									str += "<div class=\"mui-table-cell mui-col-xs-8\">";
+									str += "<p><a href=\"javascript:void(0)\" onclick=\"checkMethod(\'" + datas[d].WarnResolveId + "\')\">" + data[d].Info + "</a></p>";
+									str += "</div>";
+									str += "<div class=\"mui-table-cell mui-col-xs-4 mui-text-right\">";
+									str += "<span class=\"mui-h5\">" + formatyn(data[d].STime) + "</span></br>";
+									str += "<span class=\"mui-h5\">" + formtState(data[d].Status) + "</span>";
+									str += "</div>";
+									str += "</div>";
+									str += "</li>";
+								};
+								document.getElementById('ulcontent').innerHTML = str;
+							}
+						},
+	                	error: function (XMLHttpRequest, textStatus, errorThrown) {
+	                    plus.nativeUI.toast("获取数据时出错，请稍后再试");
+	                }
+					});
+				};
+			document.getElementById('closeMethod').addEventListener('click', close4);
+		    //关闭窗口的方法
+			function close4() {
+//				mui('#pullrefresh').pullRefresh().setStopped(false);
+				document.getElementById('showMethod').style.display = 'none';
+			}
+			
+			function checkMethod(id)
+		    {
+		    	$.ajax({
+						type: "get",
+						url: baseUrl + "/WarnResolve/getinfo"+"?WarnResolveId="+id,
+						dataType: "json",
+						success: function(data) {
+							if(data != null) {
+								var datas = eval(data);
+								document.getElementById('WarnResolveId4').innerText=datas.WarnResolveId;
+								document.getElementById('CoverNo4').innerText="井盖编号："+datas.CoverNo;
+								document.getElementById('Info4').innerText="详细内容："+datas.Info;
+								document.getElementById('Siturtion4').innerText="现场情况："+datas.Siturtion;
+								document.getElementById('WarnReason4').innerText="故障原因："+datas.WarnReason;
+								if(datas.Progress==""||datas.Progress==null){
+									document.getElementById('Progress4').innerText="";
+								}else{									
+									document.getElementById('Progress4').innerText="处理进度情况："+datas.Progress;
+								}
+								document.getElementById('Method4').innerText="处理方法："+datas.Method;
+								document.getElementById('ETime4').innerText="完成时间："+formatyn(datas.ETime);
+							}
+							scrollTo(0,0);
+							document.getElementById('showMethod').style.display = 'block';
+						},
+	                	error: function (XMLHttpRequest, textStatus, errorThrown) {
+	                    plus.nativeUI.toast("获取数据失败，请稍后重试");
+	                }
+					});
+		    }
+		</script>
+	</body>
+</html>
